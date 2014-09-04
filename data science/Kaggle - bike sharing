@@ -1,0 +1,51 @@
+1. I started with calculating the Mean value of the counts from the dataset and applied that value staright to the testset. I got a score of 1.583.
+
+2.  Then I started analyzing different attributes of the data set. I plotted graph for (x = hour , y = count, season) and noted this pattern from the graph:
+
+For all the seasons:
+  Hour       Count
+-------     ----------
+0-3 AM 	~30
+4-5AM	~0
+7-9AM	~350
+5-7PM	~500
+
+I hardcoded these values in the test set and my score improved by 0.346 and became 1.237.
+
+I found weather is another important factor affecting the count. I plotted the graph again and found:
+
+Weather     Count (Mean)
+--------	----------
+1	  205
+2	  178
+3	  118
+4	  164
+
+I hardcoded these values in the test set and my score showed little improvement of 0.01546.
+
+Then I analyzed season vs count and found out:
+
+Season     Count (Mean)
+--------	----------
+1	  116
+2	  215
+3	  234
+4	  198
+
+I hardcoded these values in the test set and my score showed further little improvement of 0.01315.
+
+3. I implemented rpart and used just few attributes from dataset and default values for cp and minsplit. There was significant improvement in my score.
+   Then I added all the attributes to my rpart model. Score improved further.
+
+4. Next I implemented RandomForest with default parameter values. My score improved by 0.14407.
+    Then I increased the value of nTree parameter. Score improved further though the improvement was not much.
+
+5. I installed package 'party' and used cforest. cforest is implementation of the random forest and bagging ensemble algorithms utilizing conditional inference trees as base learners.
+    I didn't see any improvement with this approach.
+
+6. I used SVM model. This approach did not work so well and score was poor.
+    I suspected that poor result is due to overfitting. So I pruned back the tree to avoid overfitting the data. But still there wasn't any improvement.
+
+7 Then I used rpart again and tweaked its parameters.  I tried different values for minsplit and changed class to anova but didn't see improvemen in score.
+   I used pruning technique again but no improvement. 
+   Then I made cp = 0 and I got my best score of 0.49150
