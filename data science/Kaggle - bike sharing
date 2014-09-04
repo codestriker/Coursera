@@ -1,51 +1,112 @@
-1. I started with calculating the Mean value of the counts from the dataset and applied that value staright to the testset. I got a score of 1.583.
+1. Task
+-----------------
+The task is to predict total count of bikes rented each hour using only information available prior to the rental period. Information available includes following attributes - hourly date & timestamp, season, whether it is holiday or working day, hourly temperature, humidity, etc. 
 
-2.  Then I started analyzing different attributes of the data set. I plotted graph for (x = hour , y = count, season) and noted this pattern from the graph:
+The training set is comprised of the first 19 days of each month, while the test set is the 20th to the end of the month. Solution evaluated by Kaggle is Root Mean Squared Logarithmic Error, so we want to have this value as low as possible.
+
+More info: https://www.kaggle.com/c/bike-sharing-demand/
+
+
+
+2.  Write a few sentences describing how you approached the problem.  What techniques did you use? 
+-----------------------------------------------------------------------------------------------------------------------
+I split datetime attribute into hour, weekday, month and year. This gave more granular view of the data and simplified things.
+
+I ignored the casual and registered users attribute that indicated count of casual and registered users. They were not relevant as we already have total count attribute. Moreover, test dataset didn't have those attributes.
+
+I converted numeric attributes like season, holiday, working day, weather, year, month and weekday to factors.
+
+I analyzed different attributes of the data set to see which ones impact the count. Plotted the graphs for this.
+
+I studied different data learning methods like Random Forest, rpart, svm, cforest and applied them on my dataset. 
+I tweaked parameters of these learning methods to improve my solution. 
+Not all methods were successful. 
+I pruned my model to avoid overfitting.
+
+
+
+3. Write a few sentences describing how you implemented your approach.  What languages and libraries did you use? What challenges did you run into?
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+I learned R for this challenge and installed Rstudio IDE. I took different approaches which I have described below:
+
+Approach 1)  I started with calculating the Mean value of the counts from the dataset and applied that value straight to the testset. 
+
+Approach 2)  Then I started analyzing different attributes of the data set and used interaction.plot(). For this, I installed 'ggplot2' package,
+I plotted graph for (x = hour , y = count, season) and noted this pattern from the graph:
 
 For all the seasons:
   Hour       Count
--------     ----------
-0-3 AM 	~30
-4-5AM	~0
-7-9AM	~350
-5-7PM	~500
+-------      ----------
+0-3 AM      ~30
+4-5AM       ~0
+7-9AM      ~350
+5-7PM      ~500
 
-I hardcoded these values in the test set and my score improved by 0.346 and became 1.237.
+I hardcoded these values in the test set and my score improved by 0.346.
 
 I found weather is another important factor affecting the count. I plotted the graph again and found:
 
 Weather     Count (Mean)
---------	----------
-1	  205
-2	  178
-3	  118
-4	  164
+--------           ----------
+   1                  205
+   2                  178
+   3                  118
+   4                  164
 
 I hardcoded these values in the test set and my score showed little improvement of 0.01546.
 
 Then I analyzed season vs count and found out:
 
 Season     Count (Mean)
---------	----------
-1	  116
-2	  215
-3	  234
-4	  198
+--------          ----------
+   1                  116
+   2                  215
+   3                  234
+   4                 198
 
 I hardcoded these values in the test set and my score showed further little improvement of 0.01315.
 
-3. I implemented rpart and used just few attributes from dataset and default values for cp and minsplit. There was significant improvement in my score.
-   Then I added all the attributes to my rpart model. Score improved further.
+Approach 3)  I implemented rpart model and used just few attributes from dataset and default values for cp and minsplit. 
+Then I added all the attributes to my rpart model. Score improved further.
+For rpart, I installed 'rpart' package.
 
-4. Next I implemented RandomForest with default parameter values. My score improved by 0.14407.
-    Then I increased the value of nTree parameter. Score improved further though the improvement was not much.
+Approach 4)  Next I installed 'randomForest' package and used andomForest with default parameter values. Then I tried after changing ntree parameter.
 
-5. I installed package 'party' and used cforest. cforest is implementation of the random forest and bagging ensemble algorithms utilizing conditional inference trees as base learners.
-    I didn't see any improvement with this approach.
+Approach 5)  I installed package 'party' and used cforest. cforest is implementation of the random forest and bagging ensemble algorithms utilizing conditional inference trees as base learners.
 
-6. I used SVM model. This approach did not work so well and score was poor.
-    I suspected that poor result is due to overfitting. So I pruned back the tree to avoid overfitting the data. But still there wasn't any improvement.
+Approach  6)  I used svm model. svm is used to train a support vector machine. It can be used to carry out general regression and classification. I installed 'e1071' package for this.
 
-7 Then I used rpart again and tweaked its parameters.  I tried different values for minsplit and changed class to anova but didn't see improvemen in score.
-   I used pruning technique again but no improvement. 
-   Then I made cp = 0 and I got my best score of 0.49150
+
+
+4.  Write a few sentences assessing your approach.  Did it work?  What do you think the problems were?
+------------------------------------------------------------------------------------------------------------
+Approach 1.   Using this simplest approach, I got a score of 1.583 which was not a bad start.
+
+Approach 2.   My score improved and became 1.20839 when I analyzed different attributes of data set. But I was not able to improve it further as I was using just 2-3 attributes at a time
+                      and was not seeing a combined affect of all the attributes.
+                      For eg: Just saying that more people bike in summers between 5-7 PM is not sufficient. What if it is a rainy day or what if the day is extremely hot?
+
+Approach 3.   There was significant improvement in my score using rpart. 
+
+Approach 4.   My score improved by 0.14407 when I used randomForest with default parameter values. I thought of changing ntree parameter value to see better result.
+
+Approach 5.   I didn't see any improvement with cforest. May be the problem was overfitting.
+
+Approach 6.   SVM model approach did not work so well and score was poor. May be again due to overfitting or may this is not the correct model for my dataset.
+
+
+
+5. Write a few sentences describing how you improved on your solution, and whether or not it worked.
+------------------------------------------------------------------------------------------------------------
+I tried different things to improve my solution. Some of them worked, some failed.
+
+I converted numeric attributes like season, holiday, working day, hour, month, weather, etc into factors.
+
+I increased the value of nTree parameter for randomForest. Score improved but not significantly.
+
+I suspected that the poor results from cforest and svm model is due to overfitting. So I pruned back the tree to avoid overfitting the data. But still there wasn't any improvement.
+pfit<- prune(fit, cp=   fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"])
+
+Then I used rpart again and tweaked its parameters.  I tried different values for minsplit and changed class to anova but didn't see improvement in score.
+I used pruning technique again but no improvement. 
+Then I made cp = 0 and I got my best score of 0.49150
